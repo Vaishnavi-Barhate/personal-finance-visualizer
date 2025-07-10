@@ -17,10 +17,27 @@ import {
 import { categories } from "@/constants/categories";
 import { Card, CardContent } from "@/components/ui/card";
 
+type Transaction = {
+  _id: string;
+  amount: number;
+  date: string;
+  category: string;
+  description: string;
+};
+
+type MonthlyData = {
+  month: string;
+  total: number;
+};
+
+type CategoryData = {
+  name: string;
+  value: number;
+};
+
 export default function DashboardPage() {
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [monthlyData, setMonthlyData] = useState<any[]>([]);
-  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+  const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
   const [summary, setSummary] = useState({
     total: 0,
     count: 0,
@@ -31,16 +48,14 @@ export default function DashboardPage() {
   useEffect(() => {
     fetch("/api/transactions")
       .then((res) => res.json())
-      .then((data) => {
-        setTransactions(data);
-
+      .then((data: Transaction[]) => {
         const monthly: Record<string, number> = {};
         const category: Record<string, number> = {};
 
         let total = 0;
         let latestDate = "";
 
-        data.forEach((t: any) => {
+        data.forEach((t: Transaction) => {
           const month = new Date(t.date).toLocaleString("default", {
             month: "short",
             year: "numeric",

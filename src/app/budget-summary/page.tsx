@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   BarChart,
   Bar,
@@ -15,18 +15,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+type BudgetSummary = {
+  category: string;
+  budget: number;
+  actualSpent: number;
+  status: string;
+  diffPercent?: number;
+  barColor?: string;
+}
+
 export default function BudgetSummaryPage() {
   const [month, setMonth] = useState("Jul-2025");
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<BudgetSummary[]>([]);
   const [insights, setInsights] = useState<
     { text: string; type: "over" | "under" }[]
   >([]);
 
-  const fetchSummary = async () => {
+  const fetchSummary = useCallback(async () => {
     const res = await fetch(`/api/budget-summary?month=${month}`);
     const result = await res.json();
 
-    const updated = result.map((item: any) => {
+    const updated = result.map((item: BudgetSummary) => {
       const budgetNum = Number(item.budget) || 0;
       const actualNum = Number(item.actualSpent) || 0;
 
@@ -46,7 +55,7 @@ export default function BudgetSummaryPage() {
 
     // Generate structured insights
     const insightsArray: { text: string; type: "over" | "under" }[] = [];
-    updated.forEach((item: any) => {
+    updated.forEach((item: BudgetSummary) => {
       const budgetNum = Number(item.budget) || 0;
       const actualNum = Number(item.actualSpent) || 0;
       const diffPercent = Number(item.diffPercent);
@@ -65,11 +74,11 @@ export default function BudgetSummaryPage() {
     });
 
     setInsights(insightsArray);
-  };
+  }, [month]);
 
   useEffect(() => {
     fetchSummary();
-  }, []);
+  }, [fetchSummary]);
 
   return (
     <main className="w-full min-h-screen p-4">
@@ -103,7 +112,7 @@ export default function BudgetSummaryPage() {
               <XAxis dataKey="category" />
               <YAxis />
               <Tooltip
-                formatter={(value: any, name: string) => [`₹${value}`, name]}
+                formatter={(value: number, name: string) => [`₹${value}`, name]}
               />
               <Legend />
               <Bar dataKey="budget" fill="#8884d8" name="Budget">
@@ -120,7 +129,7 @@ export default function BudgetSummaryPage() {
               >
                 <LabelList
                   dataKey="diffPercent"
-                  content={({ x, y, value, index }) => {
+                  content={({ x, y, value }) => {
                     if (value == null) return null;
 
                     const safeY = typeof y === "number" ? y - 10 : 0;

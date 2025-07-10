@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models, Document, Model } from "mongoose";
+import { Schema, model, models, Document, Model } from "mongoose";
 
 export interface IBudget extends Document {
   category: string;

@@ -5,8 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/constants/categories";
 
+type Budget = {
+  _id: string;
+  category: string;
+  month: string;
+  amount: number;
+};
+
 export default function BudgetPage() {
-  const [budgets, setBudgets] = useState<any[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [formData, setFormData] = useState({
     category: "",
     month: "",
@@ -24,7 +31,7 @@ export default function BudgetPage() {
     setBudgets(data);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     await fetch("/api/budgets", {

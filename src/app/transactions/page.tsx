@@ -13,9 +13,25 @@ import {
 } from "@/components/ui/table";
 import { categories } from "@/constants/categories";
 
+type Transaction = {
+  _id: string;
+  amount: number;
+  date: string;
+  description: string;
+  category: string;
+};
+
+type FormData = {
+  amount: string;
+  date: string;
+  description: string;
+  category: string;
+  id: string | null;
+};
+
 export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [formData, setFormData] = useState({
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [formData, setFormData] = useState<FormData>({
     amount: "",
     date: "",
     description: "",
@@ -48,7 +64,7 @@ export default function TransactionsPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (
@@ -83,9 +99,9 @@ export default function TransactionsPage() {
     setLoading(false);
   };
 
-  const handleEdit = (transaction: any) => {
+  const handleEdit = (transaction: Transaction) => {
     setFormData({
-      amount: transaction.amount,
+      amount: transaction.amount.toString(),
       date: transaction.date.substring(0, 10),
       description: transaction.description,
       category: transaction.category,
